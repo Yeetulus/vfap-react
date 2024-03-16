@@ -1,37 +1,61 @@
 import React from 'react';
-import { Navbar, Nav, NavDropdown, Form, FormControl, Button } from 'react-bootstrap';
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faUser } from '@fortawesome/free-solid-svg-icons';
+import {Navbar, Nav, NavDropdown, Form, FormControl, Button, Tooltip, OverlayTrigger} from 'react-bootstrap';
 import 'bootstrap/dist/css/bootstrap.min.css';
+import '../styles/global.scss'
+import {Link} from "react-router-dom";
+import {PersonFill} from "react-bootstrap-icons";
 
 const Toolbar = () => {
+
+    function logout() {
+        console.log("Hello");
+    }
+
     return (
-        <Navbar bg="light" expand="lg">
-            <Navbar.Brand href="#home">
-                <img
-                    src="your-logo-url.png"
-                    height="30"
-                    className="d-inline-block align-top"
-                    alt="Your Logo"
-                />
+        <Navbar bg="primary" className="toolbar">
+            <Navbar.Brand>
+                <Link to="/">
+                    <Button className="logo">
+                        <span className="logo-left">Web</span>
+                        <span className="logo-right">Lib</span>
+                    </Button>
+                </Link>
             </Navbar.Brand>
 
             <Navbar.Toggle aria-controls="basic-navbar-nav" />
 
-            <Navbar.Collapse id="basic-navbar-nav">
-                <Form inline className="mx-auto">
+            <Navbar.Collapse id="basic-navbar-nav" className="navbar-collapse">
+                <Form className="mx-auto">
                     <FormControl type="text" placeholder="Search" className="mr-sm-2" />
-                    <Button variant="outline-success">Search</Button>
                 </Form>
             </Navbar.Collapse>
 
             <Navbar.Collapse className="justify-content-end">
                 <Nav>
-                    <NavDropdown title={<FontAwesomeIcon icon={faUser} />} id="basic-nav-dropdown">
-                        <NavDropdown.Item href="#action/1">Profile</NavDropdown.Item>
-                        <NavDropdown.Item href="#action/2">Settings</NavDropdown.Item>
+                    <NavDropdown
+                        className="dropdown-offset"
+                        title={
+                            <OverlayTrigger placement="bottom" overlay={
+                                <Tooltip id="menu-tooltip">Open Menu</Tooltip>
+                            }>
+                                <span>
+                                  <PersonFill className="dropdown-icon" />
+                                </span>
+                            </OverlayTrigger>
+                        }
+                        id="basic-nav-dropdown"
+                        drop="down-centered"
+                    >
+                        <NavDropdown.Item as={Link} to="/loans" className="on-hover-primary dropdown-item dropdown-item-primary-bg">
+                            Loans
+                        </NavDropdown.Item>
+                        <NavDropdown.Item as={Link} to="/reservations" className="on-hover-primary dropdown-item dropdown-item-primary-bg">
+                            Reservations
+                        </NavDropdown.Item>
                         <NavDropdown.Divider />
-                        <NavDropdown.Item href="#action/3">Logout</NavDropdown.Item>
+                        <NavDropdown.Item onClick={logout} className="on-hover-danger dropdown-item dropdown-item-danger-bg">
+                            Logout
+                        </NavDropdown.Item>
                     </NavDropdown>
                 </Nav>
             </Navbar.Collapse>

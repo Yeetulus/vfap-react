@@ -1,0 +1,75 @@
+@import '~bootstrap/scss/bootstrap';
+
+$primary-color: $primary;
+$primary-subtle-color: $primary-bg-subtle;
+$danger-color: $danger;
+$danger-subtle-color: $danger-bg-subtle;
+$white-color: white;
+
+.app-body{
+    height: 100vh;
+    overflow-y: hidden;
+    overflow-x: hidden;
+}
+
+.page-body{
+    height: 100%;
+}
+
+.logo-right {
+    color: white;
+}
+
+.logo-left {
+    color: black;
+}
+
+.logo {
+    margin-left: 10px;
+    cursor: pointer;
+    font-size: 24pt;
+    padding: 2px 16px;
+
+    span {
+        font-weight: bolder;
+        letter-spacing: 2px;
+    }
+}
+
+.dropdown-icon {
+    font-size: 20pt;
+    color: $white-color;
+    margin-right: 8px;
+}
+
+.dropdown-toggle::after {
+    display: none !important;
+}
+
+.dropdown-offset .dropdown-menu {
+    margin-left: -110px;
+}
+
+.dropdown-item{
+    font-weight: 500;
+}
+
+.dropdown-item-primary-bg:active{
+    background-color: $primary-subtle-color;
+}
+.dropdown-item-danger-bg:active{
+    background-color: $danger-subtle-color;
+}
+
+.on-hover-primary:hover {
+    color: $primary-color;
+    transition: color 0.3s ease;
+}
+.on-hover-danger:hover {
+    color: $danger-color;
+    transition: color 0.3s ease;
+}
+
+.toolbar{
+    height: 80px;
+}

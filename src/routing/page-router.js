@@ -14,25 +14,27 @@ import {BookSearch} from "../components/pages/member/book-search";
 import {MemberReservations} from "../components/pages/member/member-reservations";
 import {MemberLoans} from "../components/pages/member/member-loans";
 import {BookDetail} from "../components/pages/member/book-detail";
+import {BooksProvider} from "../model/books-context";
 
 export function PageRouter() {
-    return (<Routes>
-        <Route path="/" element={<HomePage/>}>
-            <Route index element={<BookSearch/>}/>
-            <Route path=":id" element={<BookDetail/>}/>
-            <Route path="reservations" element={<MemberReservations/>}/>
-            <Route path="loans" element={<MemberLoans/>}/>
-        </Route>
-        <Route path="/librarian" element={<LibrarianPage/>}>
-            <Route index element={<LibraryLoans/>}/>
-            <Route path="authors" element={<LibraryAuthors/>}/>
-            <Route path="books" element={<LibraryBooks/>}/>
-            <Route path="copies" element={<LibraryCopies/>}/>
-            <Route path="genres" element={<LibraryGenres/>}/>
-        </Route>
-        <Route path="/admin" element={<AdminPage/>}/>
-        <Route path="/login" element={<LoginPage/>}/>
-        <Route path="/register" element={<RegisterPage/>}/>
-        <Route path="*" element={<NotFoundPage/>}/>
-    </Routes>);
+    return (
+        <Routes>
+            <Route path="/" element={<BooksProvider><HomePage/></BooksProvider>}>
+                <Route index element={<BookSearch/>}/>
+                <Route path=":id" element={<BookDetail/>}/>
+                <Route path="reservations" element={<MemberReservations/>}/>
+                <Route path="loans" element={<MemberLoans/>}/>
+            </Route>
+            <Route path="/librarian" element={<LibrarianPage/>}>
+                <Route index element={<LibraryLoans/>}/>
+                <Route path="authors" element={<LibraryAuthors/>}/>
+                <Route path="books" element={<LibraryBooks/>}/>
+                <Route path="copies" element={<LibraryCopies/>}/>
+                <Route path="genres" element={<LibraryGenres/>}/>
+            </Route>
+            <Route path="/admin" element={<AdminPage/>}/>
+            <Route path="/login" element={<LoginPage/>}/>
+            <Route path="/register" element={<RegisterPage/>}/>
+            <Route path="*" element={<NotFoundPage/>}/>
+        </Routes>);
 }

@@ -1,0 +1,17 @@
+.genre-button {
+    text-align: left;
+    margin-left: 5px;
+    margin-bottom: 5px;
+    position: relative;
+    width: 98%;
+    display: flex;
+    align-items: center;
+}
+
+.genre-button-black-text{
+    color: black;
+}
+
+.genre-button-white-text{
+    color: white;
+}
