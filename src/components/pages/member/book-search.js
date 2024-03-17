@@ -1,5 +1,5 @@
 import {useEffect} from "react";
-import {useBooksContext} from "../../../model/books-context";
+import {useBooksContext} from "../../../context/books-context";
 import {Col, Row} from "react-bootstrap";
 import '../../../styles/global.scss'
 import Sidebar from "../../sidebar/member-sidebar";

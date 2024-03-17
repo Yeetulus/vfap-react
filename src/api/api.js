@@ -16,9 +16,9 @@ const handleResponse = async (response, successCallback, errorCallback, redirect
         successCallback(data);
     } else {
         const errorData = await response.json();
-        errorCallback(errorData);
+        if(errorCallback) errorCallback(errorData);
         if(response.status === 403 && redirectToLogin){
-            // TODO redirect to logout
+            redirectToLogin();
         }
     }
 };
@@ -28,9 +28,8 @@ const apiRequest = async (method, url, params, body, requiresAuth, successCallba
         method: method,
         headers: getHeaders(requiresAuth),
     };
-
     if (body) {
-        options.data = body;
+        options.body = JSON.stringify(body);
     }
 
     const queryString = new URLSearchParams(params).toString();

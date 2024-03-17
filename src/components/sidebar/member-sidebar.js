@@ -1,4 +1,4 @@
-import {useBooksContext} from "../../model/books-context";
+import {useBooksContext} from "../../context/books-context";
 import GenreButton from "./sidebar-genre-button";
 
 const Sidebar = () =>{
@@ -29,6 +29,8 @@ const Sidebar = () =>{
                     toggleGenre={toggleGenre}
                 />
             ))}
+            <hr/>
+
         </div>
     );
 };

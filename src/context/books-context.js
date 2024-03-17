@@ -1,5 +1,5 @@
 import {createContext, useContext, useState} from "react";
-import {get} from "./api";
+import {get} from "../api/api";
 
 const BooksContext = createContext();
 export function BooksProvider({children}){
@@ -30,21 +30,41 @@ export function BooksProvider({children}){
         const url = 'library/search';
         const params = {
             searchedValue: term,
-            genreIds: selectedGenres,
             searchOnlyAvailable: availableOnly,
         };
+        const genreIds = getGenreIds();
+        if (genreIds !== undefined) {
+            params.genreIds = genreIds;
+        }
         if (authorId !== undefined && authorId !== null) {
             params.authorId = authorId;
         }
-        get(url, params, false, response, undefined, false);
+        get(url, params, false, response);
     };
+
+    const getGenreIds = () => {
+        if(selectedGenres.length > 0) return selectedGenres.map(genre => genre.id);
+        else return undefined;
+    }
+
+    const fetchSelectedBook = (bookId) => {
+        const url = "library/get";
+        const params = {
+            bookId: bookId
+        };
+        const response = (book) => {
+            setSelectedBook(book);
+        };
+        get(url, params, false, response);
+
+    }
 
     const fetchGenres = () => {
         const url = "library/genres";
         const response = (data) => {
             setGenres(data);
         };
-        get(url, undefined, false, response, undefined, false);
+        get(url, undefined, false, response);
     }
 
     return (
@@ -63,6 +83,7 @@ export function BooksProvider({children}){
             setGenres,
             fetchSearchBarResults,
             fetchBookResults,
+            fetchSelectedBook,
             fetchGenres,
         }}>
             {children}

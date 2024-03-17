@@ -1,5 +1,5 @@
 import { Button } from "react-bootstrap";
-import "./sidebar-genre-button.css";
+import "../../styles/global.scss";
 
 const GenreButton = ({ genre, selectedGenres, toggleGenre }) => {
 
@@ -8,9 +8,9 @@ const GenreButton = ({ genre, selectedGenres, toggleGenre }) => {
         <Button
             variant={ selected? "primary" : "outline-light"}
             onClick={() => toggleGenre(genre)}
-            className={`genre-button`}
+            className={`genre-button ${selected ? "genre-button-white-text" : "genre-button-black-text"}`}
         >
-            <span className={selected? "genre-button-white-text" : "genre-button-black-text"}>{genre.name}</span>
+            <span>{genre.name}</span>
         </Button>
     );
 };
