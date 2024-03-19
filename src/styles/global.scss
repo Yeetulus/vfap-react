@@ -6,6 +6,53 @@ $danger-color: $danger;
 $danger-subtle-color: $danger-bg-subtle;
 $white-color: white;
 
+.clickable{
+    cursor: pointer;
+}
+
+.non-selectable{
+    user-select: none;
+}
+
+.scrollbar {
+    overflow-y: auto;
+    margin-right: 4px;
+    &::-webkit-scrollbar {
+        width: 12px;
+    }
+    &::-webkit-scrollbar-thumb {
+        cursor: pointer;
+        background-color: $primary-color;
+        border: 1px gray;
+        border-radius: 10px;
+    }
+    &::-webkit-scrollbar-track {
+        background-color: transparent;
+    }
+}
+
+.card-hover-primary{
+
+    transition: background-color 0.3s ease;
+    &:hover{
+        background-color: $primary-subtle-color;
+    }
+}
+
+.text-clickable-primary{
+    cursor: pointer;
+    transition: color 0.3s ease;
+
+    &:hover{
+        color: $primary-color !important;
+    }
+}
+
+.text-primary-bold{
+    font-weight: bold;
+    color: $primary-color;
+}
+
 .app-body{
     height: 100vh;
     overflow-y: hidden;

@@ -1,7 +1,7 @@
 import {createContext, useContext, useState} from "react";
 import {post} from "../api/api";
 import {accessTokenName, refreshTokenName} from "../utils/tokens";
-import {showSnackbar} from "../utils/snackbar-display";
+import {errorType, showSnackbar, successType} from "../utils/snackbar-display";
 import {useNavigate} from "react-router-dom";
 import {admin, librarian} from "../utils/roles";
 
@@ -31,7 +31,7 @@ export function AuthProvider({children}) {
         setAuthenticated(true);
         setRole(data.role);
 
-        showSnackbar("Logged in");
+        showSnackbar("Logged in", successType);
         navigateToPage(data.role);
     }
 
@@ -54,10 +54,14 @@ export function AuthProvider({children}) {
         const response = (data) => {
             authSuccess(data);
         }
-        post(url, {}, body, false, response, undefined);
+        const error = (error) => {
+            console.error(error);
+            showSnackbar("Incorrect login input", errorType);
+        }
+        post(url, {}, body, false, response, error);
     }
 
-    const logout = () =>{
+    const logout = () => {
 
         localStorage.removeItem(userId);
         localStorage.removeItem(userRole);

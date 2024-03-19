@@ -1,8 +1,10 @@
-import Snackbar from "../components/snackbar";
+import {toast} from "react-toastify";
 
+export const showSnackbar = (message, type = "default") => {
+    toast(message, {
+        type: type
+    });
+};
 
-export function showSnackbar(message, type, duration){
-    return(
-        <Snackbar message={message} type={type} duration={duration} />
-    );
-}
+export const successType = 'success';
+export const errorType = 'error';

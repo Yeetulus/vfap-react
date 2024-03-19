@@ -11,11 +11,15 @@ export function BooksProvider({children}){
     const [genres, setGenres] = useState([]);
 
     const fetchSearchBarResults = (term, authorId) => {
-        const response = (data) => {
-            setSearchBarResults(data);
-            console.log("Search bar results", data);
-        };
-        fetchBooks(term, response, authorId);
+
+        return new Promise((resolve, reject) => {
+            const response = (data) => {
+                setSearchBarResults(data);
+                console.log("Search bar results", data);
+                resolve(data);
+            };
+            fetchBooks(term, response, authorId);
+        });
     };
 
     const fetchBookResults = (term, authorId) => {

@@ -12,7 +12,7 @@ const Toolbar = () => {
 
     const navigate = useNavigate();
     const [searchTerm, setSearchTerm] = useState('');
-    const { searchBarResults, setSearchBarResults, fetchSearchBarResults, setSelectedBook } = useBooksContext();
+    const { searchBarResults, setSearchBarResults, fetchSearchBarResults, setSelectedBook, setBookResults } = useBooksContext();
     const { logout } = useAuthContext();
 
     const handleSearchChange = (e) => {
@@ -23,7 +23,11 @@ const Toolbar = () => {
 
     const handleSearchSubmit = (e) => {
         e.preventDefault();
-        fetchSearchBarResults(searchTerm);
+        fetchSearchBarResults(searchTerm).then(data => {
+            setBookResults(data);
+            setSearchTerm('');
+            setSearchBarResults([]);
+        });
     };
 
     function showBookDetail(result) {
