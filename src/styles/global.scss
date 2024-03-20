@@ -2,6 +2,7 @@
 
 $primary-color: $primary;
 $primary-subtle-color: $primary-bg-subtle;
+$success-color: #49c200;
 $danger-color: $danger;
 $danger-subtle-color: $danger-bg-subtle;
 $white-color: white;
@@ -51,6 +52,29 @@ $white-color: white;
 .text-primary-bold{
     font-weight: bold;
     color: $primary-color;
+}
+
+.text-success-bold{
+    font-weight: bold;
+    color: $success-color;
+}
+.text-danger-bold{
+    font-weight: bold;
+    color: $danger-color;
+}
+
+.availability-info{
+    position: absolute;
+    bottom: 0;
+    right: 0;
+    margin: 10px;
+}
+
+.rating-info{
+    position: absolute;
+    top: 0;
+    right: 0;
+    margin: 15px;
 }
 
 .app-body{
@@ -161,4 +185,18 @@ $white-color: white;
 
 .genre-button-white-text{
     color: $white-color;
+}
+
+.text-grey{
+    color: #a8a8a8;
+    position: relative;
+    margin-left: 5px;
+}
+.star-icon{
+    margin-left: 4px;
+}
+
+.book-view-authors{
+    display: inline-block;
+    margin-top: -5px;
 }

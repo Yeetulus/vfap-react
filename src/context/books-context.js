@@ -71,6 +71,29 @@ export function BooksProvider({children}){
         get(url, undefined, false, response);
     }
 
+    const fetchReviews = (bookId, setReviews) => {
+        const url = "library/review";
+        const params = {
+            bookId: bookId
+        }
+        const response = (data) => {
+            console.log(`Fetched review for book with ID ${bookId}`);
+            setReviews(data);
+        }
+        get(url, params, false, response);
+    }
+
+    const fetchAvailability = (bookId, setAvailability) => {
+        const url = "library/available"
+        const response = (data) => {
+            setAvailability(data);
+        }
+        const params = {
+            bookId: bookId
+        }
+        get(url, params, false, response);
+    }
+
     return (
         <BooksContext.Provider value={{
             availableOnly,
@@ -89,6 +112,8 @@ export function BooksProvider({children}){
             fetchBookResults,
             fetchSelectedBook,
             fetchGenres,
+            fetchReviews,
+            fetchAvailability
         }}>
             {children}
         </BooksContext.Provider>
