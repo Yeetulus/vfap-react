@@ -49,6 +49,15 @@ $white-color: white;
     }
 }
 
+.text-clickable-danger{
+    cursor: pointer;
+    transition: color 0.3s ease;
+
+    &:hover{
+        color: $danger-color !important;
+    }
+}
+
 .text-primary-bold{
     font-weight: bold;
     color: $primary-color;
@@ -145,6 +154,9 @@ $white-color: white;
     height: 70px;
 }
 
+.h-85{
+    height: 85%;
+}
 
 .autocomplete {
     position: absolute;
@@ -199,4 +211,9 @@ $white-color: white;
 .book-view-authors{
     display: inline-block;
     margin-top: -5px;
+}
+
+.tooltip-width{
+    max-width: none;
+    overflow: hidden;
 }

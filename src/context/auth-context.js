@@ -1,20 +1,40 @@
-import {createContext, useContext, useState} from "react";
+import {createContext, useContext, useEffect, useState} from "react";
 import {post} from "../api/api";
 import {accessTokenName, refreshTokenName} from "../utils/tokens";
 import {errorType, showSnackbar, successType} from "../utils/snackbar-display";
 import {useNavigate} from "react-router-dom";
 import {admin, librarian} from "../utils/roles";
+import {jwtDecode} from "jwt-decode";
 
 const AuthContext = createContext();
 
-const userId= "userId";
-const userRole = "userRole";
+export const userId= "userId";
+export const userRole = "userRole";
 
 export function AuthProvider({children}) {
 
     const [authenticated, setAuthenticated] = useState(false);
     const [role, setRole] = useState(undefined);
     const navigate = useNavigate();
+
+    useEffect(() => {
+        const accessToken = localStorage.getItem(accessTokenName);
+        if (accessToken) {
+            const decodedToken = jwtDecode(accessToken);
+            const currentTime = Date.now() / 1000;
+            if (decodedToken.exp < currentTime) {
+                setAuthenticated(false);
+                setRole(undefined);
+                localStorage.removeItem(userId);
+                localStorage.removeItem(userRole);
+                localStorage.removeItem(refreshTokenName);
+                localStorage.removeItem(accessTokenName);
+            } else {
+                setAuthenticated(true);
+                setRole(localStorage.getItem(userRole));
+            }
+        }
+    });
     const isAuthenticated = () =>{
         return authenticated && authenticated === true && role !== undefined;
     }
@@ -63,6 +83,8 @@ export function AuthProvider({children}) {
 
     const logout = () => {
 
+        setAuthenticated(false);
+        setRole(undefined);
         localStorage.removeItem(userId);
         localStorage.removeItem(userRole);
         localStorage.removeItem(refreshTokenName);

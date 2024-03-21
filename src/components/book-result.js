@@ -9,6 +9,7 @@ export const BookResult = ({book, onClick}) => {
 
     const [reviews, setReviews] = useState(null);
     const [availability, setAvailability] = useState(0);
+
     const{
         fetchReviews,
         fetchAvailability
@@ -21,7 +22,7 @@ export const BookResult = ({book, onClick}) => {
         fetchAvailability(book.id, (data) => {
             setAvailability(data);
         });
-    }, [book.id]);
+    }, [book]);
 
     return(
         <Card onClick={() => onClick()} className="my-1 me-2 clickable non-selectable card-hover-primary">

@@ -4,7 +4,11 @@ import {useNavigate, useParams} from "react-router-dom";
 import React, {useEffect, useState} from "react";
 import {getReleaseYear} from "../../../utils/date-utils";
 import {StarFill} from "react-bootstrap-icons";
-import {Card, Pagination} from "react-bootstrap";
+import {Button, Card, Form, Modal, Pagination} from "react-bootstrap";
+import {BookReview} from "../../book-review";
+import RangeSlider from "react-bootstrap-range-slider";
+import {useAuthContext, userId} from "../../../context/auth-context";
+import {member} from "../../../utils/roles";
 
 export function BookDetail() {
 
@@ -12,12 +16,18 @@ export function BookDetail() {
     const [availability, setAvailability] = useState(0);
 
     const navigate = useNavigate();
+    const {authenticated, role} = useAuthContext();
     const {
         selectedBook,
         fetchSelectedBook,
         fetchBookResults,
         fetchReviews,
-        fetchAvailability
+        fetchAvailability,
+        fetchLoans,
+        deleteReview,
+        editReview,
+        createReview,
+        createReservation
     } = useBooksContext();
     const { id } = useParams();
 
@@ -31,39 +41,108 @@ export function BookDetail() {
         if(selectedBook === undefined || selectedBook === null) return;
 
         fetchReviews(selectedBook.id, (data) => {
-            pageCount = Math.ceil(data.messages.length / ITEMS_PER_PAGE);
-            offset = currentPage * ITEMS_PER_PAGE;
-            currentPageReviews = data.messages.slice(offset, offset + ITEMS_PER_PAGE);
             setReviews(data);
-            console.log(data.messages);
+            canLeaveReview(data);
         });
         fetchAvailability(selectedBook.id, (data) => setAvailability(data))
 
-    }, [selectedBook]);
+    }, [selectedBook?.id]);
 
     const searchAuthorBooks = (authorId) => {
         fetchBookResults('', authorId);
         navigate("/");
     }
+    const searchGenreBooks = () => {
+        fetchBookResults(selectedBook.genre.name)
+        navigate("/");
+    }
 
-    const ITEMS_PER_PAGE = 5;
     const [currentPage, setCurrentPage] = useState(1);
+    const [reviewsPerPage] = useState(5);
 
-    const handlePageChange = (page) => {
-        setCurrentPage(page);
+    const indexOfLastBook = currentPage * reviewsPerPage;
+    const indexOfFirstBook = indexOfLastBook - reviewsPerPage;
+    const currentReviews = reviews && reviews.messages? reviews.messages.slice(indexOfFirstBook, indexOfLastBook) : [];
+    const paginate = (pageNumber) => setCurrentPage(pageNumber);
+
+    const [sliderValue, setSliderValue] = useState(0);
+    const [inputValue, setInputValue] = useState('');
+
+    const [showEditModal, setShowEditModal] = useState(false);
+    const [selectedMessage, setSelectedMessage] = useState(null);
+    const handleClose = () => {
+        setSelectedMessage(null);
+        setShowEditModal(false);
+    };
+    const handleShowEditModal = (message) => {
+        setSelectedMessage(message);
+        setShowEditModal(true)
+    };
+    const handleEditSubmit = () => {
+        const success = (data) => {
+            fetchReviews(selectedBook.id, (data) => {
+                setReviews(data);
+                canLeaveReview(data);
+            });
+        };
+        editReview(selectedMessage.bookId, success, sliderValue, inputValue);
+        handleClose();
     };
 
-    let offset = 0;
-    let pageCount = 1;
-    let currentPageReviews = [];
+    const handleSliderChange = (event) => {
+        setSliderValue(event.target.value);
+    };
+    const handleInputChange = (event) => {
+        setInputValue(event.target.value);
+    };
+    const submitCreateReview = (event) => {
+        const success = (newReview) => {
+            fetchReviews(selectedBook.id, (data) => {
+                setReviews(data);
+                canLeaveReview(data);
+            });
+        }
+        createReview(selectedBook.id, success, inputValue, sliderValue);
+        setSliderValue(0);
+        setInputValue('');
+    };
+
+    const [showReviewForm, setShowReviewForm] = useState(false);
+
+    async function canLeaveReview(data) {
+        if(!authenticated || data === null) return false;
+        fetchLoans((loans) => {
+            const canLeaveReview = loans.some(loan => loan.copy.book.id === selectedBook.id);
+            const id = localStorage.getItem(userId);
+            const alreadyPostedReview = data.messages.some(message => message.userId.toString() === id);
+            setShowReviewForm(canLeaveReview && !alreadyPostedReview);
+        });
+    }
+
+    const removeReview = (message) => {
+        const success = () => {
+            fetchReviews(selectedBook.id, (data) => {
+                setReviews(data);
+                canLeaveReview(data);
+            });
+        }
+        deleteReview(message.bookId, success);
+    }
+
+    const handleCreateReservation = () => {
+        const success = () => {
+            setAvailability(availability- 1);
+        }
+        createReservation(selectedBook.id, success);
+    }
 
     return(
         <>
             {
                 selectedBook? (
-                    <div className={"mt-2 ms-4 h-100 scrollbar"}>
+                    <div className={"mt-2 ms-4 h-85 scrollbar"}>
                         <h3 className={"text-primary-bold"}>{selectedBook.title}</h3>
-                        <p className={"text-clickable-primary fw-bold"}>{selectedBook.genre.name}</p>
+                        <p className={"text-clickable-primary fw-bold"} onClick={() => searchGenreBooks()}>{selectedBook.genre.name}</p>
                         {
                             (selectedBook.authors?.length > 0)?
                             <div className="book-view-authors">
@@ -78,7 +157,16 @@ export function BookDetail() {
                         }
                         <br/><span>Released: {getReleaseYear(selectedBook.releaseDate)}</span>
                         <br/><span>Pages: {selectedBook.pages}</span>
-                        <br/><span>Available: <span className={availability!==0? "text-success-bold" : "text-danger-bold"}>{availability}</span></span><br/>
+                        <br/>
+                        {
+                            authenticated === false?
+                            <>
+                                <span>Available: <span
+                                className={availability !== 0 ? "text-success-bold" : "text-danger-bold"}>{availability}
+                                </span></span>
+                                <br/>
+                            </> : <></>
+                        }
                         {reviews?.reviewsCount > 0 ? (
                             <>
                                 <h4 style={{ marginLeft: "-2px", marginTop: "4px" }}>Reviews</h4>
@@ -87,43 +175,115 @@ export function BookDetail() {
                                     <StarFill color={"#ffea00"} className="star-icon" />
                                     <span className="text-grey">({reviews.reviewsCount})</span>
                                 </div>
-                                <div className={"pb-2"}>
-                                    {currentPageReviews.map((message, index) => (
-                                        <Card key={index} className="my-1 me-4 col-md-6 col-lg-4">
-                                            <Card.Body>
-                                                <div className="d-flex rating-info align-items-center">
-                                                    <span>{message.rating}</span>
-                                                    <StarFill color={"#ffea00"} className="star-icon" />
-                                                </div>
-                                                <Card.Title>{message.name}</Card.Title>
-                                                <Card.Text>{message.comment}</Card.Text>
-                                            </Card.Body>
-                                        </Card>
+                                { reviews?.messages?.length > 0 && ( <div className={"pb-2"}>
+                                    {currentReviews.map((message, index) => (
+                                        <BookReview key={index} message={message} onEdit={() => handleShowEditModal(message)} onDelete={() => removeReview(message)}></BookReview>
                                     ))}
-                                </div>
-                                {pageCount > 1 && (
-                                    <Pagination className="mt-3 justify-content-start">
-                                        {currentPage !== 0 && (
-                                            <Pagination.Prev onClick={() => handlePageChange(currentPage - 1)} />
-                                        )}
-                                        {Array.from({ length: pageCount }).map((_, index) => (
+                                </div> )}
+                                { reviews?.messages?.length > 0 && (<Pagination className="mt-3 justify-content-start">
+                                    {reviews.messages.length > reviewsPerPage ? (
+                                        <Pagination.Prev
+                                            onClick={() =>
+                                                setCurrentPage(
+                                                    currentPage > 1 ? currentPage - 1 : currentPage
+                                                )
+                                            }
+                                        />
+                                    ) : null}
+                                    {Array.from({length: Math.ceil(reviews.messages.length / reviewsPerPage)}).map(
+                                        (number, index) => (
                                             <Pagination.Item
                                                 key={index}
-                                                active={index === currentPage}
-                                                onClick={() => handlePageChange(index)}
+                                                active={index + 1 === currentPage}
+                                                onClick={() => paginate(index + 1)}
                                             >
                                                 {index + 1}
                                             </Pagination.Item>
-                                        ))}
-                                        {currentPage !== pageCount - 1 && (
-                                            <Pagination.Next onClick={() => handlePageChange(currentPage + 1)} />
-                                        )}
-                                    </Pagination>
-                                )}
+                                        )
+                                    )}
+                                    {reviews.messages.length > reviewsPerPage ? (
+                                        <Pagination.Next
+                                            onClick={() =>
+                                                setCurrentPage(
+                                                    currentPage < Math.ceil(reviews.messages.length / reviewsPerPage)
+                                                        ? currentPage + 1
+                                                        : currentPage
+                                                )
+                                            }
+                                        />
+                                    ) : null}
+                                </Pagination>)}
                             </>
                         ) : (
                             <></>
                         )}
+                        { showReviewForm?
+                            <Card className={"mt-2 col-md-6 col-lg-4 me-4"}>
+                            <Card.Body>
+                                <h5>Leave a review</h5>
+                                <Form >
+                                    <Form.Label>Rating: {sliderValue}</Form.Label><br/>
+                                    <RangeSlider value={sliderValue} onChange={handleSliderChange} max={5} min={0}
+                                                 className={"w-25"} tooltip={"off"}/>
+                                    <br/>
+
+                                    <Form.Group controlId="comment">
+                                        <Form.Label>Comment:</Form.Label>
+                                        <Form.Control
+                                            as="textarea"
+                                            rows={3}
+                                            value={inputValue}
+                                            onChange={handleInputChange}
+                                            placeholder="Enter comment"
+                                        />
+                                    </Form.Group>
+
+                                    <Button onClick={submitCreateReview} className={"mt-1"} type="button" variant="primary">Submit Review</Button>
+                                </Form>
+                            </Card.Body>
+                        </Card>  : <></>}
+                        {
+                            authenticated === true && role === member?
+                                <>
+                                    <h5>Reservations</h5>
+                                    <span>Available: <span
+                                        className={availability !== 0 ? "text-success-bold" : "text-danger-bold"}>{availability}
+                                    </span></span>
+                                    <br/>
+                                    {
+                                        availability > 0?
+                                        <Button onClick={() => handleCreateReservation()} className={"mt-1"} type="button"
+                                             variant="primary">Create Reservation
+                                        </Button> : <></>}
+                                </> : <></>
+                        }
+                        <Modal show={showEditModal} onHide={handleClose}>
+                            <Modal.Header closeButton>
+                                <Modal.Title>Edit Review</Modal.Title>
+                            </Modal.Header>
+                            <Modal.Body>
+                                <Form>
+                                    <Form.Label>Rating: {sliderValue}</Form.Label><br/>
+                                    <RangeSlider value={sliderValue} onChange={handleSliderChange} max={5} min={0}
+                                                 className={"w-25"} tooltip={"off"}/>
+                                    <br/>
+
+                                    <Form.Group controlId="comment">
+                                        <Form.Label>Comment:</Form.Label>
+                                        <Form.Control
+                                            as="textarea"
+                                            rows={3}
+                                            value={inputValue}
+                                            onChange={handleInputChange}
+                                            placeholder="Enter comment"
+                                        />
+                                    </Form.Group>
+
+                                    <Button onClick={() =>handleEditSubmit()} className={"mt-1"} type="button" variant="primary">Submit Review</Button>
+                                </Form>
+                            </Modal.Body>
+                        </Modal>
+                        <div className={"py-3"} />
                     </div>
                 ) : (
                     <p className="mt-4 ms-4">No book found</p>

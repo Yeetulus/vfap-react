@@ -13,7 +13,7 @@ const Toolbar = () => {
     const navigate = useNavigate();
     const [searchTerm, setSearchTerm] = useState('');
     const { searchBarResults, setSearchBarResults, fetchSearchBarResults, setSelectedBook, setBookResults } = useBooksContext();
-    const { logout } = useAuthContext();
+    const { logout, authenticated } = useAuthContext();
 
     const handleSearchChange = (e) => {
         const newSearchTerm = e.target.value;
@@ -28,6 +28,7 @@ const Toolbar = () => {
             setSearchTerm('');
             setSearchBarResults([]);
         });
+        navigate("/")
     };
 
     function showBookDetail(result) {
@@ -74,33 +75,47 @@ const Toolbar = () => {
             </Navbar.Collapse>
 
             <Navbar.Collapse className="justify-content-end">
-                <Nav>
-                    <NavDropdown
-                        className="dropdown-offset"
-                        title={
-                            <OverlayTrigger placement="bottom-start" overlay={
-                                <Tooltip id="menu-tooltip">Open Menu</Tooltip>
-                            }>
+                {authenticated?
+                    <Nav>
+                        <NavDropdown
+                            className="dropdown-offset"
+                            title={
+                                <OverlayTrigger placement="bottom-start"
+                                                overlay={
+                                                    <Tooltip className={"tooltip-width"} id="menu-tooltip" >Open Menu</Tooltip>
+                                                }>
                                 <span>
                                   <PersonFill className="dropdown-icon" />
                                 </span>
-                            </OverlayTrigger>
-                        }
-                        id="basic-nav-dropdown"
-                        drop="down-centered"
-                    >
-                        <NavDropdown.Item as={Link} to="/loans" className="on-hover-primary dropdown-item dropdown-item-primary-bg">
-                            Loans
-                        </NavDropdown.Item>
-                        <NavDropdown.Item as={Link} to="/reservations" className="on-hover-primary dropdown-item dropdown-item-primary-bg">
-                            Reservations
-                        </NavDropdown.Item>
-                        <NavDropdown.Divider />
-                        <NavDropdown.Item onClick={() => logout()} className="on-hover-danger dropdown-item dropdown-item-danger-bg">
-                            Logout
-                        </NavDropdown.Item>
-                    </NavDropdown>
-                </Nav>
+                                </OverlayTrigger>
+                            }
+                            id="basic-nav-dropdown"
+                            drop="down-centered"
+                        >
+                            <NavDropdown.Item as={Link} to="/loans" className="on-hover-primary dropdown-item dropdown-item-primary-bg">
+                                Loans
+                            </NavDropdown.Item>
+                            <NavDropdown.Item as={Link} to="/reservations" className="on-hover-primary dropdown-item dropdown-item-primary-bg">
+                                Reservations
+                            </NavDropdown.Item>
+                            <NavDropdown.Divider />
+                            <NavDropdown.Item onClick={() => logout()} className="on-hover-danger dropdown-item dropdown-item-danger-bg">
+                                Logout
+                            </NavDropdown.Item>
+                        </NavDropdown>
+                    </Nav>
+                 :
+                    <Nav>
+                        <OverlayTrigger placement="bottom-start"
+                                        overlay={
+                                            <Tooltip className={"tooltip-width"} id="menu-tooltip" >Login</Tooltip>
+                                        }>
+                            <span onClick={() => logout()}>
+                              <PersonFill className="clickable dropdown-icon" />
+                            </span>
+                        </OverlayTrigger>
+                    </Nav>
+                }
             </Navbar.Collapse>
         </Navbar>
     );

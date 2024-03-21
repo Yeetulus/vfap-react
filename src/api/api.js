@@ -12,8 +12,13 @@ function getHeaders(requiresAuth){
 
 const handleResponse = async (response, successCallback, errorCallback, redirectToLogin) => {
     if (response.ok) {
-        const data = await response.json();
-        successCallback(data);
+        try {
+            const data = await response.json();
+            successCallback(data);
+        }
+        catch (error) {
+            successCallback(null);
+        }
     } else {
         const errorData = await response.json();
         if(errorCallback) errorCallback(errorData);
@@ -41,9 +46,12 @@ const apiRequest = async (method, url, params, body, requiresAuth, successCallba
         await handleResponse(response, successCallback, errorCallback, redirectToLogin);
     } catch (error) {
         if(errorCallback !== undefined){
-            errorCallback();
+            errorCallback(error);
         } else{
             console.error(error);
+        }
+        if(error.status === 403 && redirectToLogin){
+            redirectToLogin();
         }
     }
 };
