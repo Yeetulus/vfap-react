@@ -5,7 +5,7 @@ import React, {useEffect, useState} from "react";
 import {getReleaseYear} from "../../../utils/date-utils";
 import {StarFill} from "react-bootstrap-icons";
 import {Button, Card, Form, Modal, Pagination} from "react-bootstrap";
-import {BookReview} from "../../book-review";
+import {BookReview} from "../../member-components/book-review";
 import RangeSlider from "react-bootstrap-range-slider";
 import {useAuthContext, userId} from "../../../context/auth-context";
 import {member} from "../../../utils/roles";

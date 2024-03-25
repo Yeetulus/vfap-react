@@ -2,33 +2,15 @@ import React, {useEffect, useState} from "react";
 import {useBooksContext} from "../../../context/books-context";
 import {Col, Pagination, Row} from "react-bootstrap";
 import '../../../styles/global.scss'
-import Sidebar from "../../sidebar/member-sidebar";
-import {BookResult} from "../../book-result";
+import Sidebar from "../../member-components/sidebar/member-sidebar";
+import {BookResult} from "../../member-components/book-result";
 import {useNavigate} from "react-router-dom";
 
 export function BookSearch(){
 
     const {
-        availableOnly,
-        setAvailableOnly,
-
-        selectedBook,
         setSelectedBook,
-
         bookResults,
-        setBookResults,
-
-        searchBarResults,
-        setSearchBarResults,
-
-        selectedGenres,
-        setSelectedGenres,
-
-        genres,
-        setGenres,
-
-        fetchSearchBarResults,
-        fetchBookResults,
         fetchGenres
 
     } = useBooksContext();

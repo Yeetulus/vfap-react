@@ -23,6 +23,7 @@ const handleResponse = async (response, successCallback, errorCallback, redirect
         const errorData = await response.json();
         if(errorCallback) errorCallback(errorData);
         if(response.status === 403 && redirectToLogin){
+            console.log("Redirecting to login")
             redirectToLogin();
         }
     }
@@ -45,13 +46,11 @@ const apiRequest = async (method, url, params, body, requiresAuth, successCallba
         const response = await fetch(apiUrl, options);
         await handleResponse(response, successCallback, errorCallback, redirectToLogin);
     } catch (error) {
-        if(errorCallback !== undefined){
+        console.log(error);
+        if (errorCallback !== undefined) {
             errorCallback(error);
-        } else{
+        } else {
             console.error(error);
-        }
-        if(error.status === 403 && redirectToLogin){
-            redirectToLogin();
         }
     }
 };

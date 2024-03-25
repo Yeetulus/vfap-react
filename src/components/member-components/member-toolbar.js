@@ -1,19 +1,20 @@
 import React, {useState} from 'react';
 import {Navbar, Nav, NavDropdown, Form, FormControl, Button, Tooltip, OverlayTrigger} from 'react-bootstrap';
 import 'bootstrap/dist/css/bootstrap.min.css';
-import '../styles/global.scss'
+import '../../styles/global.scss'
 import {Link} from "react-router-dom";
 import {PersonFill} from "react-bootstrap-icons";
-import {useBooksContext} from "../context/books-context";
+import {useBooksContext} from "../../context/books-context";
 import { useNavigate } from "react-router-dom";
-import {useAuthContext} from "../context/auth-context";
+import {useAuthContext, userRole} from "../../context/auth-context";
+import {member} from "../../utils/roles";
 
-const Toolbar = () => {
+const MemberToolbar = () => {
 
     const navigate = useNavigate();
     const [searchTerm, setSearchTerm] = useState('');
     const { searchBarResults, setSearchBarResults, fetchSearchBarResults, setSelectedBook, setBookResults } = useBooksContext();
-    const { logout, authenticated } = useAuthContext();
+    const { logout, authenticated, role } = useAuthContext();
 
     const handleSearchChange = (e) => {
         const newSearchTerm = e.target.value;
@@ -76,36 +77,50 @@ const Toolbar = () => {
 
             <Navbar.Collapse className="justify-content-end">
                 {authenticated?
-                    <Nav>
-                        <NavDropdown
-                            className="dropdown-offset"
-                            title={
-                                <OverlayTrigger placement="bottom-start"
-                                                overlay={
-                                                    <Tooltip className={"tooltip-width"} id="menu-tooltip" >Open Menu</Tooltip>
-                                                }>
+                    (
+                        role === member?
+                        <Nav>
+                            <NavDropdown
+                                className="dropdown-offset"
+                                title={
+                                    <OverlayTrigger placement="bottom-start"
+                                                    overlay={
+                                                        <Tooltip className={"tooltip-width"} id="menu-tooltip" >Open Menu</Tooltip>
+                                                    }>
                                 <span>
                                   <PersonFill className="dropdown-icon" />
                                 </span>
-                                </OverlayTrigger>
-                            }
-                            id="basic-nav-dropdown"
-                            drop="down-centered"
-                        >
-                            <NavDropdown.Item as={Link} to="/loans" className="on-hover-primary dropdown-item dropdown-item-primary-bg">
-                                Loans
-                            </NavDropdown.Item>
-                            <NavDropdown.Item as={Link} to="/reservations" className="on-hover-primary dropdown-item dropdown-item-primary-bg">
-                                Reservations
-                            </NavDropdown.Item>
-                            <NavDropdown.Divider />
-                            <NavDropdown.Item onClick={() => logout()} className="on-hover-danger dropdown-item dropdown-item-danger-bg">
-                                Logout
-                            </NavDropdown.Item>
-                        </NavDropdown>
-                    </Nav>
+                                    </OverlayTrigger>
+                                }
+                                id="basic-nav-dropdown"
+                                drop="down-centered"
+                            >
+                                <NavDropdown.Item as={Link} to="/loans" className="on-hover-primary dropdown-item dropdown-item-primary-bg">
+                                    Loans
+                                </NavDropdown.Item>
+                                <NavDropdown.Item as={Link} to="/reservations" className="on-hover-primary dropdown-item dropdown-item-primary-bg">
+                                    Reservations
+                                </NavDropdown.Item>
+                                <NavDropdown.Divider />
+                                <NavDropdown.Item onClick={() => logout()} className="on-hover-danger dropdown-item dropdown-item-danger-bg">
+                                    Logout
+                                </NavDropdown.Item>
+                            </NavDropdown>
+                        </Nav> :
+                        <Nav className={"me-1"}>
+                            <OverlayTrigger placement="bottom-start"
+                                            overlay={
+                                                <Tooltip className={"tooltip-width"} id="menu-tooltip" >Logout</Tooltip>
+                                            }>
+                        <span onClick={() => logout()}>
+                          <PersonFill className="clickable dropdown-icon" />
+                        </span>
+                            </OverlayTrigger>
+                        </Nav>
+                    )
+
                  :
-                    <Nav>
+                    <Nav className={"me-1"}>
                         <OverlayTrigger placement="bottom-start"
                                         overlay={
                                             <Tooltip className={"tooltip-width"} id="menu-tooltip" >Login</Tooltip>
@@ -121,4 +136,4 @@ const Toolbar = () => {
     );
 };
 
-export default Toolbar;
+export default MemberToolbar;

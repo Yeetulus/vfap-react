@@ -7,6 +7,10 @@ $danger-color: $danger;
 $danger-subtle-color: $danger-bg-subtle;
 $white-color: white;
 
+.grey-bg{
+    background: $secondary-bg-subtle;
+}
+
 .clickable{
     cursor: pointer;
 }
@@ -40,12 +44,25 @@ $white-color: white;
     }
 }
 
+.text-white{
+    color: $white-color;
+}
+
 .text-clickable-primary{
     cursor: pointer;
     transition: color 0.3s ease;
 
     &:hover{
         color: $primary-color !important;
+    }
+}
+
+.text-clickable-grey{
+    cursor: pointer;
+    transition: color 0.3s ease;
+
+    &:hover{
+        color: $secondary-bg-subtle !important;
     }
 }
 

@@ -1,12 +1,14 @@
-import {useBooksContext} from "../../context/books-context";
+import {useBooksContext} from "../../../context/books-context";
 import GenreButton from "./sidebar-genre-button";
-
+import { Form } from "react-bootstrap";
 const Sidebar = () =>{
 
     const{
         genres,
         selectedGenres,
-        setSelectedGenres
+        setSelectedGenres,
+        availableOnly,
+        setAvailableOnly
     } = useBooksContext();
 
     function toggleGenre(genre) {
@@ -16,6 +18,9 @@ const Sidebar = () =>{
         setSelectedGenres(updatedGenres);
     }
 
+    const handleToggleSwitch = () => {
+        setAvailableOnly(!availableOnly);
+    };
 
     return (
         <div>
@@ -30,7 +35,14 @@ const Sidebar = () =>{
                 />
             ))}
             <hr/>
-
+            <Form.Check
+                type="switch"
+                id="toggle-switch"
+                label={availableOnly ? "Show available only" : "Show all"}
+                checked={availableOnly}
+                onChange={handleToggleSwitch}
+                style={{ marginLeft: "15px", marginBottom: "10px" }}
+            />
         </div>
     );
 };

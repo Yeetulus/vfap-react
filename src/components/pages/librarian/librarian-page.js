@@ -1,9 +1,11 @@
 import {Outlet} from "react-router-dom";
+import LibrarianToolbar from "../../librarian-components/librarian-toolbar";
+import "../../../styles/global.scss";
 
 export function LibrarianPage() {
     return(
-        <div>
-            <h1>Librarian</h1>
+        <div className={"app-body"}>
+            <LibrarianToolbar/>
             <Outlet/>
         </div>
     )

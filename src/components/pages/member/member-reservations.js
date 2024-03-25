@@ -4,11 +4,12 @@ import React, {useEffect, useState} from "react";
 import {Button, Card, CardBody} from "react-bootstrap";
 import {useBooksContext} from "../../../context/books-context";
 import {useNavigate} from "react-router-dom";
+import {ReservationCard} from "../../member-components/reservation-card";
 
 export function MemberReservations(){
 
     const [reservations, setReservations] = useState([]);
-    const { fetchReservations,fetchSelectedBook, fetchBookResults } = useBooksContext();
+    const { fetchReservations,fetchSelectedBook, fetchBookResults, cancelReservation } = useBooksContext();
     const navigate = useNavigate();
 
     useEffect(() => {
@@ -26,28 +27,28 @@ export function MemberReservations(){
         fetchBookResults('', id);
         navigate("/");
     };
-    const cancelReservation = (reservation) => {
-        
+    const handleCancelReservation = (reservation) => {
+        const success = () => {
+            setReservations(prevReservations => prevReservations.filter(res => res.id !== reservation.id));
+        };
+        cancelReservation(reservation.book.id, success);
     };
     return(
         <div className={"mt-2 ms-4 h-85 scrollbar"}>
-            <h3>Reservations</h3>
+            { reservations.length > 0?
+                <h3>Reservations</h3> : <p className={"mt-3 ms-2"}>You have no reservations</p>
+            }
             {
                 reservations.map((reservation, index) => {
                     return (
-                    <Card key={index} className={"my-1 me-4 col-md-8 col-lg-6"}>
-                        <CardBody>
-                            <h5 className={"text-clickable-primary"} onClick={() => navigateToBookDetail(reservation.book.id)}>
-                                {reservation.book.title}
-                            </h5>
-                            {reservation.book.authors.map((author, _index) =>
-                                <span key={_index} className={"text-clickable-primary"} onClick={() => searchBooksByAuthor(author.id)}>
-                                    {author.name}
-                                </span>
-                            )}
-                            <Button className={"rating-info"} onClick={() => cancelReservation(reservation)}>Cancel</Button>
-                        </CardBody>
-                    </Card>)
+                        <ReservationCard reservation={reservation}
+                                         navigateToBookDetail={navigateToBookDetail}
+                                         key={index}
+                                         searchBooksByAuthor={searchBooksByAuthor}
+                                         handleCancelReservation={handleCancelReservation}>
+
+                        </ReservationCard>
+                    )
                 })
             }
         </div>

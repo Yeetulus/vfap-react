@@ -2,7 +2,7 @@ import {PencilFill, StarFill, XCircleFill} from "react-bootstrap-icons";
 import React from "react";
 import 'bootstrap/dist/css/bootstrap.min.css';
 import {Card, OverlayTrigger, Tooltip} from "react-bootstrap";
-import {userId} from "../context/auth-context";
+import {userId} from "../../context/auth-context";
 
 export const BookReview = ({message, onEdit, onDelete}) => {
 

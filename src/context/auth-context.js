@@ -18,6 +18,9 @@ export function AuthProvider({children}) {
     const navigate = useNavigate();
 
     useEffect(() => {
+        checkAccessToken();
+    }, [])
+    const checkAccessToken = () => {
         const accessToken = localStorage.getItem(accessTokenName);
         if (accessToken) {
             const decodedToken = jwtDecode(accessToken);
@@ -29,17 +32,22 @@ export function AuthProvider({children}) {
                 localStorage.removeItem(userRole);
                 localStorage.removeItem(refreshTokenName);
                 localStorage.removeItem(accessTokenName);
+                return false;
             } else {
                 setAuthenticated(true);
                 setRole(localStorage.getItem(userRole));
+                return true;
             }
         }
-    });
-    const isAuthenticated = () =>{
-        return authenticated && authenticated === true && role !== undefined;
+        return false;
+    }
+    const isAuthenticated = () => {
+        return checkAccessToken();
     }
     const hasRole = (requiredRole) => {
-        return role !== undefined && requiredRole === role;
+        const _role = localStorage.getItem(userRole);
+        setRole(_role);
+        return _role !== undefined && requiredRole === _role;
     }
 
     const authSuccess = (data) => {

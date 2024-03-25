@@ -1,6 +1,7 @@
 import {createContext, useContext, useState} from "react";
 import {del, get, post, put} from "../api/api";
 import {errorType, showSnackbar, successType} from "../utils/snackbar-display";
+import {Navigate, useNavigate} from "react-router-dom";
 
 const BooksContext = createContext();
 export function BooksProvider({children}){
@@ -10,6 +11,11 @@ export function BooksProvider({children}){
     const [searchBarResults, setSearchBarResults] = useState([]);
     const [selectedGenres, setSelectedGenres] = useState([]);
     const [genres, setGenres] = useState([]);
+
+    const navigate = useNavigate();
+    const redirect = () => {
+        navigate("/login");
+    }
 
     const fetchSearchBarResults = (term, authorId) => {
 
@@ -100,7 +106,34 @@ export function BooksProvider({children}){
         const response = (data) => {
             callback(data)
         }
-        get(url, {}, true, response, undefined, true);
+        get(url, {}, true, response, undefined, redirect);
+    }
+
+    const fetchActiveLoans = (callback) => {
+        const url = "member/loan/get-all-active";
+        const response = (data) => {
+            callback(data)
+        }
+        get(url, {}, true, response, undefined, redirect);
+    }
+
+    const fetchLibrarianLoans = (email, callback) => {
+        const url = "librarian/loan/user-loans";
+        librarianLoans(email, callback, url);
+    }
+    const fetchLibrarianLoansActive = (email, callback) => {
+        const url = "librarian/loan/user-loans-active";
+        librarianLoans(email, callback, url);
+    }
+    const librarianLoans = (email, callback, url) => {
+        const params = {
+            userEmail: email
+        };
+        const response = (data) => {
+            console.log(data);
+            callback(data);
+        }
+        get(url, params, true, response, undefined, redirect);
     }
 
     const deleteReview = (bookId, callback) => {
@@ -111,7 +144,7 @@ export function BooksProvider({children}){
         const response = () => {
             callback();
         }
-        del(url, params, true, response, undefined, true);
+        del(url, params, true, response, undefined, redirect);
     }
 
     const createReview = (bookId, callback, comment, rating) => {
@@ -124,7 +157,7 @@ export function BooksProvider({children}){
         const response = (data) => {
             callback(data);
         }
-        post(url, {}, body, true, response, undefined, true);
+        post(url, {}, body, true, response, undefined, redirect);
     }
 
     const editReview = (bookId, callback, rating, comment) =>{
@@ -140,7 +173,7 @@ export function BooksProvider({children}){
         const response = (data) => {
             callback(data);
         }
-        put(url, params, body, true, response, undefined, true);
+        put(url, params, body, true, response, undefined, redirect);
     }
 
     const createReservation = (bookId, callback) =>{
@@ -156,7 +189,7 @@ export function BooksProvider({children}){
             console.error(error)
             showSnackbar("Cannot create reservation", errorType);
         }
-        post(url, params, {}, true, response, error, true);
+        post(url, params, {}, true, response, error, redirect);
     }
 
     const fetchReservations = (callback) => {
@@ -165,7 +198,57 @@ export function BooksProvider({children}){
             console.log(data);
             callback(data);
         }
-        get(url, {}, true, response, undefined, true);
+        get(url, {}, true, response, undefined, redirect);
+    }
+
+    const cancelReservation = (bookId, callback) => {
+        const url = "member/reservation/cancel";
+        const params = {
+            bookId: bookId
+        }
+        const response = () => {
+            showSnackbar("Canceled reservation", successType);
+            callback();
+        }
+        const error = (error) => {
+            console.error(error);
+            showSnackbar("Cannot cancel reservation", errorType);
+        }
+        del(url, params, true, response, error, redirect);
+    }
+
+    const returnLoan = (loanId, callback) => {
+        const url = "librarian/loan/return";
+        const params = {
+            loanId: loanId
+        };
+        const response = (data) => {
+            callback(data);
+        }
+        put(url, params, {}, true, response, undefined, redirect);
+    }
+
+    const createLoan = (email, copyId, callback) => {
+        const url = "librarian/loan/create";
+        const params = {
+            userEmail: email,
+            copyId: copyId
+        };
+        const response = (data) => {
+            callback(data);
+        }
+        post(url, params, {}, true, response, undefined, redirect);
+    }
+
+    const fetchCopies = (bookId, callback) => {
+        const url = "librarian/copy/get-all";
+        const params = {
+            bookId: bookId,
+        };
+        const response = (data) => {
+            callback(data);
+        }
+        get(url, params, true, response, undefined, redirect);
     }
 
     return (
@@ -189,11 +272,19 @@ export function BooksProvider({children}){
             fetchReviews,
             fetchAvailability,
             fetchLoans,
+            fetchActiveLoans,
+            fetchLibrarianLoansActive,
+            fetchLibrarianLoans,
             deleteReview,
             editReview,
             createReview,
             createReservation,
-            fetchReservations
+            fetchReservations,
+            cancelReservation,
+            returnLoan,
+            createLoan,
+            fetchCopies
+
         }}>
             {children}
         </BooksContext.Provider>

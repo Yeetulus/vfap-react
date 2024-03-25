@@ -17,7 +17,7 @@ import {BookDetail} from "../components/pages/member/book-detail";
 import {BooksProvider} from "../context/books-context";
 import {AuthProvider} from "../context/auth-context";
 import {PrivateRoute} from "./private-route";
-import {librarian} from "../utils/roles";
+import {librarian, member} from "../utils/roles";
 
 export function PageRouter() {
     return (
@@ -26,12 +26,12 @@ export function PageRouter() {
                 <Route path="/" element={<BooksProvider><HomePage/></BooksProvider>}>
                     <Route index element={<BookSearch/>}/>
                     <Route path=":id" element={<BookDetail/>}/>
-                    <Route path="reservations" element={<MemberReservations/>}/>
-                    <Route path="loans" element={<MemberLoans/>}/>
+                    <Route path="reservations" element={ <PrivateRoute element={ <MemberReservations/>} requiredRole={member} />} />
+                    <Route path="loans" element={<PrivateRoute element={<MemberLoans/>} requiredRole={member}/>}/>
                 </Route>
                 <Route path="/librarian" element={
                     <PrivateRoute element={
-                        <LibrarianPage/>
+                        <BooksProvider><LibrarianPage/></BooksProvider>
                     } requiredRole={librarian} />
                 }>
                     <Route index element={<LibraryLoans/>}/>

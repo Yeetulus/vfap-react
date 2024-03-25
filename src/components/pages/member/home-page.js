@@ -1,11 +1,12 @@
 import {Outlet} from "react-router-dom";
-import Toolbar from "../../member-toolbar";
+import MemberToolbar from "../../member-components/member-toolbar";
+import "../../../styles/global.scss"
 
 export function HomePage() {
 
     return(
         <div className="app-body">
-            <Toolbar></Toolbar>
+            <MemberToolbar></MemberToolbar>
             <Outlet></Outlet>
         </div>
     )

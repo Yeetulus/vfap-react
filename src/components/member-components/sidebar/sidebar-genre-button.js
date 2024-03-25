@@ -1,5 +1,5 @@
 import { Button } from "react-bootstrap";
-import "../../styles/global.scss";
+import "../../../styles/global.scss";
 
 const GenreButton = ({ genre, selectedGenres, toggleGenre }) => {
 

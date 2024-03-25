@@ -1,8 +1,8 @@
 import {Card} from "react-bootstrap";
-import {getReleaseYear} from "../utils/date-utils";
+import {getReleaseYear} from "../../utils/date-utils";
 import React, {useEffect, useState} from "react";
-import '../styles/global.scss';
-import {useBooksContext} from "../context/books-context";
+import '../../styles/global.scss';
+import {useBooksContext} from "../../context/books-context";
 import {StarFill} from "react-bootstrap-icons";
 
 export const BookResult = ({book, onClick}) => {
