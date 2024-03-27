@@ -1,7 +1,8 @@
 import {createContext, useContext, useState} from "react";
 import {del, get, post, put} from "../api/api";
 import {errorType, showSnackbar, successType} from "../utils/snackbar-display";
-import {Navigate, useNavigate} from "react-router-dom";
+import {useNavigate} from "react-router-dom";
+import {eliminatedState} from "../utils/copy-states";
 
 const BooksContext = createContext();
 export function BooksProvider({children}){
@@ -11,6 +12,7 @@ export function BooksProvider({children}){
     const [searchBarResults, setSearchBarResults] = useState([]);
     const [selectedGenres, setSelectedGenres] = useState([]);
     const [genres, setGenres] = useState([]);
+    const [authors, setAuthors] = useState([]);
 
     const navigate = useNavigate();
     const redirect = () => {
@@ -78,6 +80,60 @@ export function BooksProvider({children}){
         get(url, undefined, false, response);
     }
 
+    const createGenre = (name) => {
+        const url = "librarian/genre/create";
+        const params = {
+            genreName: name
+        }
+        const response = (genre) => {
+            setGenres([...genres, genre]);
+            showSnackbar(`Created genre: ${genre.name}`, successType);
+        }
+        const error = () => {
+            showSnackbar("Cannot create genre", errorType);
+        }
+        post(url, params, {}, true, response, error, redirect);
+    }
+    const editGenre = (name, newName) => {
+        const url = "librarian/genre/update";
+        const params = {
+            genreName: name,
+            newName: newName
+        }
+        const response = (genre) => {
+            const index = genres.findIndex(g => g.name === name);
+            if (index !== -1) {
+                const updatedGenres = [...genres];
+                updatedGenres[index] = genre;
+                setGenres(updatedGenres);
+                showSnackbar(`Updated genre: ${genre.name}`, successType);
+            } else {
+                showSnackbar("Cannot update genre", errorType);
+            }
+        };
+
+        const error = () => {
+            showSnackbar("Cannot update genre", errorType);
+        }
+        put(url, params, {}, true, response, error, redirect);
+    }
+
+    const deleteGenre = (name) => {
+        const url = "librarian/genre/delete";
+        const params = {
+            name: name
+        }
+        const response = () => {
+            const updatedGenres = genres.filter(genre => genre.name !== name);
+            setGenres(updatedGenres);
+            showSnackbar(`Deleted genre ${name}`, successType);
+        }
+        const error = () => {
+            showSnackbar("Cannot delete genre", errorType);
+        }
+        del(url, params, true, response, error, redirect);
+    }
+
     const fetchReviews = (bookId, setReviews) => {
         const url = "library/review";
         const params = {
@@ -133,7 +189,7 @@ export function BooksProvider({children}){
             console.log(data);
             callback(data);
         }
-        get(url, params, true, response, undefined, redirect);
+        get(url, params, true, response, () => {}, redirect);
     }
 
     const deleteReview = (bookId, callback) => {
@@ -182,7 +238,7 @@ export function BooksProvider({children}){
             bookId: bookId
         }
         const response = (reservation) => {
-            callback();
+            callback(reservation);
             showSnackbar("Reservation successful", successType);
         }
         const error = (error) => {
@@ -251,6 +307,138 @@ export function BooksProvider({children}){
         get(url, params, true, response, undefined, redirect);
     }
 
+    const eliminateCopy = (copyId, callback) => {
+        const url = "librarian/copy/update";
+        const params = {
+            copyId: copyId,
+            condition: eliminatedState
+        };
+        const response = (data) => {
+            callback(data);
+            showSnackbar("Eliminated copy", successType)
+        }
+        const error = () => {
+            showSnackbar("Could not eliminate copy", errorType)
+        }
+        put(url, params, {}, true, response, error, redirect);
+    }
+
+    const createCopy = (bookId, callback) => {
+        const url = "librarian/copy/create";
+        const params = {
+            bookId: bookId
+        };
+        const response= (copy) => {
+            callback(copy);
+            showSnackbar("Created new copy", successType);
+        }
+        const error = () => {
+            showSnackbar("Cannot create new copy", errorType);
+        }
+        post(url, params, {}, true, response, error, redirect);
+    }
+
+    const fetchAuthors = () => {
+        const url = "librarian/author/get-all";
+        const response = (data) =>{
+            console.log(data);
+            setAuthors(data);
+        };
+        get(url, {}, true, response, undefined, redirect);
+    }
+
+
+    const createAuthor = (name) => {
+        const url = "librarian/author/create";
+        const params = {
+            name: name
+        }
+        const response = (data) => {
+            setAuthors([...authors, data]);
+            showSnackbar("Created new author", successType);
+        };
+        post(url, params, {}, true, response, undefined, redirect);
+    }
+
+    const editAuthor = (id, newName) => {
+        const url = "librarian/author/update";
+        const params = {
+            id: id,
+            newName: newName
+        }
+        const response = (data) => {
+            const updatedAuthors = authors.map(author => {
+                if (author.id === id) {
+                    return { ...author, name: data.name };
+                } else {
+                    return author;
+                }
+            });
+            setAuthors(updatedAuthors);
+            showSnackbar("Updated author", successType);
+        };
+        const error = () => {
+            showSnackbar("Cannot update author", errorType);
+        }
+        put(url, params, {}, true, response, error, redirect);
+    }
+
+    const deleteAuthor = (id) => {
+        const url = "librarian/author/delete";
+        const params = {
+            id: id,
+        }
+        const response = () => {
+            const updatedAuthors = authors.filter(author => author.id !== id);
+            setAuthors(updatedAuthors);
+            showSnackbar("Deleted author", successType);
+        };
+        const error = () => {
+            showSnackbar("Cannot delete author", errorType);
+        }
+        del(url, params,  true, response, error, redirect);
+    }
+
+    const createBook = (body, success) => {
+        const url = "librarian/book/create";
+        const response = (newBook) => {
+            console.log("New Book", newBook);
+            success(newBook);
+            showSnackbar("Book created", successType);
+        }
+        const error = () => {
+            showSnackbar("Cannot create book", errorType);
+        }
+        post(url, {}, body, true, response, error, redirect);
+    }
+
+    const editBook = (body, success) => {
+        const url = "librarian/book/update";
+        const response = (newBook) => {
+            success(newBook);
+            showSnackbar("Book updated", successType);
+        }
+        const error = () => {
+            showSnackbar("Cannot update book", errorType);
+        }
+        put(url, {}, body, true, response, error, redirect);
+    }
+
+    const deleteBook = (bookId, success) => {
+        const url = "librarian/book/delete";
+        const params = {
+            id: bookId
+        };
+        const response = () => {
+            success();
+            showSnackbar("Book deleted", successType);
+        }
+        const error = () => {
+            showSnackbar("Cannot delete book", errorType);
+        }
+        del(url, params, true, response, error, redirect);
+    }
+
     return (
         <BooksContext.Provider value={{
             availableOnly,
@@ -269,6 +457,9 @@ export function BooksProvider({children}){
             fetchBookResults,
             fetchSelectedBook,
             fetchGenres,
+            createGenre,
+            editGenre,
+            deleteGenre,
             fetchReviews,
             fetchAvailability,
             fetchLoans,
@@ -283,7 +474,18 @@ export function BooksProvider({children}){
             cancelReservation,
             returnLoan,
             createLoan,
-            fetchCopies
+            fetchCopies,
+            eliminateCopy,
+            createCopy,
+            authors,
+            setAuthors,
+            fetchAuthors,
+            createAuthor,
+            editAuthor,
+            deleteAuthor,
+            createBook,
+            editBook,
+            deleteBook,
 
         }}>
             {children}

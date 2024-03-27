@@ -1,4 +1,4 @@
 
-export const available = "AVAILABLE";
-export const eliminated = "ELIMINATED";
-export const borrowed = "BORROWED";
+export const availableState = "AVAILABLE";
+export const eliminatedState = "ELIMINATED";
+export const borrowedState = "BORROWED";

@@ -4,11 +4,12 @@ import {useNavigate, useParams} from "react-router-dom";
 import React, {useEffect, useState} from "react";
 import {getReleaseYear} from "../../../utils/date-utils";
 import {StarFill} from "react-bootstrap-icons";
-import {Button, Card, Form, Modal, Pagination} from "react-bootstrap";
+import {Button, Card, Form, Pagination} from "react-bootstrap";
 import {BookReview} from "../../member-components/book-review";
 import RangeSlider from "react-bootstrap-range-slider";
 import {useAuthContext, userId} from "../../../context/auth-context";
 import {member} from "../../../utils/roles";
+import {UniversalModal} from "../../universal-modal";
 
 export function BookDetail() {
 
@@ -90,7 +91,7 @@ export function BookDetail() {
     };
 
     const handleSliderChange = (event) => {
-        setSliderValue(event.target.value);
+        setSliderValue(event);
     };
     const handleInputChange = (event) => {
         setInputValue(event.target.value);
@@ -135,6 +136,11 @@ export function BookDetail() {
         }
         createReservation(selectedBook.id, success);
     }
+
+    const formElements = [
+        { id: 'input1', label: 'Description', type: 'textarea', placeholder: "Type in your opinion", onChange: handleInputChange },
+        { id: 'range1', label: 'Rating', type: 'range', max: 5, min: 0, onChange: handleSliderChange },
+    ];
 
     return(
         <>
@@ -223,7 +229,7 @@ export function BookDetail() {
                                 <h5>Leave a review</h5>
                                 <Form >
                                     <Form.Label>Rating: {sliderValue}</Form.Label><br/>
-                                    <RangeSlider value={sliderValue} onChange={handleSliderChange} max={5} min={0}
+                                    <RangeSlider value={sliderValue} onChange={(e) => handleSliderChange(e.target.value)} max={5} min={0}
                                                  className={"w-25"} tooltip={"off"}/>
                                     <br/>
 
@@ -257,32 +263,13 @@ export function BookDetail() {
                                         </Button> : <></>}
                                 </> : <></>
                         }
-                        <Modal show={showEditModal} onHide={handleClose}>
-                            <Modal.Header closeButton>
-                                <Modal.Title>Edit Review</Modal.Title>
-                            </Modal.Header>
-                            <Modal.Body>
-                                <Form>
-                                    <Form.Label>Rating: {sliderValue}</Form.Label><br/>
-                                    <RangeSlider value={sliderValue} onChange={handleSliderChange} max={5} min={0}
-                                                 className={"w-25"} tooltip={"off"}/>
-                                    <br/>
-
-                                    <Form.Group controlId="comment">
-                                        <Form.Label>Comment:</Form.Label>
-                                        <Form.Control
-                                            as="textarea"
-                                            rows={3}
-                                            value={inputValue}
-                                            onChange={handleInputChange}
-                                            placeholder="Enter comment"
-                                        />
-                                    </Form.Group>
-
-                                    <Button onClick={() =>handleEditSubmit()} className={"mt-1"} type="button" variant="primary">Submit Review</Button>
-                                </Form>
-                            </Modal.Body>
-                        </Modal>
+                        <UniversalModal
+                            formElements={formElements}
+                            title={"Edit Review"}
+                            confirmText={"Submit Review"}
+                            show={showEditModal}
+                            onHide={handleClose}
+                            onConfirm={() => handleEditSubmit()} />
                         <div className={"py-3"} />
                     </div>
                 ) : (
@@ -290,4 +277,4 @@ export function BookDetail() {
                 )}
         </>
     );
-};
+}

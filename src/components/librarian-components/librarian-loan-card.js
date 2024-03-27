@@ -1,6 +1,7 @@
 import {Card, CardText, CardTitle} from "react-bootstrap";
 import {formatDate} from "../../utils/date-utils";
 import 'bootstrap/dist/css/bootstrap.min.css';
+import "../../styles/global.scss";
 import {XCircleFill} from "react-bootstrap-icons";
 
 export const LibrarianLoanCard = ({loan, returnLoan}) => {

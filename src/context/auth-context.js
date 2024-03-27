@@ -19,7 +19,8 @@ export function AuthProvider({children}) {
 
     useEffect(() => {
         checkAccessToken();
-    }, [])
+    }, []);
+
     const checkAccessToken = () => {
         const accessToken = localStorage.getItem(accessTokenName);
         if (accessToken) {
